@@ -1,0 +1,94 @@
+# Persistent Volumes and Claims
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cdn-static-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/cdn
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cdn-static-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: cdn-static-pv
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cdn
+  template:
+    metadata:
+      labels:
+        app: cdn
+    spec:
+      containers:
+        - name: cdn
+          image: eacer/simple-cdn-service
+          ports:
+            - containerPort: 80
+          env:
+            - name: SERVER_NAME
+              value: cdn.xyz.abc
+            - name: ALLOWED_LAN
+              value: '10.14.1.0/24 10.14.0.0/16'
+          volumeMounts:
+            - name: static-volume
+              mountPath: /usr/share/nginx/html
+              readOnly: true
+          imagePullPolicy: Always
+      volumes:
+        - name: static-volume
+          persistentVolumeClaim:
+            claimName: cdn-static-pvc
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+  name: cdn-service
+spec:
+  selector:
+    app: cdn
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cdn-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: cdn.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cdn-service
+                port:
+                  number: 80

@@ -1,0 +1,132 @@
+# Persistent Volumes and Claims
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: wrknts-data-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/wrknts/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wrknts-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: wrknts-data-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: wrknts-config-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/wrknts/config
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wrknts-config-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: wrknts-config-pv
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wrknts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wrknts
+  template:
+    metadata:
+      labels:
+        app: wrknts
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: wrknts
+          image: ghcr.io/fccview/rwmarkable:main
+          ports:
+            - containerPort: 8484
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: HTTPS
+              value: 'false'
+          volumeMounts:
+            - name: data-volume
+              mountPath: /app/data
+              readOnly: false
+            - name: config-volume
+              mountPath: /app/config
+              readOnly: false
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: wrknts-data-pvc
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: wrknts-config-pvc
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+  name: wrknts-service
+spec:
+  selector:
+    app: wrknts
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wrknts-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  tls:
+    - hosts:
+        - wrknts.xyz.abc
+      secretName: homelab-tls
+  rules:
+    - host: wrknts.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wrknts-service
+                port:
+                  number: 3000

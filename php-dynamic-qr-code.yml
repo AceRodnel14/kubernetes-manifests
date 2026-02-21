@@ -1,0 +1,111 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: qrcode-data-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/qr
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qrcode-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: qrcode-data-pv
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qrcode
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qrcode
+  template:
+    metadata:
+      labels:
+        app: qrcode
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: qrcode
+          image: giandonatoinverso/php-dynamic-qr-code:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: TYPE
+              value: docker
+            - name: QRCODE_GENERATOR
+              value: internal-chillerlan.qrcode
+            - name: BASE_URL
+              value: http://qrcode.xyz.abc
+            - name: DATABASE_HOST
+              value: 123.45.6.70
+            - name: DATABASE_PORT
+              value: "3306"
+            - name: DATABASE_NAME
+              value: qrcode
+            - name: DATABASE_USER
+              value: qrcode
+            - name: DATABASE_PASSWORD
+              value: F-passme
+            - name: DATABASE_PREFIX
+              value: ""
+            - name: DATABASE_CHARSET
+              value: "utf8"
+          volumeMounts:
+            - name: data-volume
+              mountPath: /var/www/html/saved_qrcode
+              readOnly: false
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: qrcode-data-pvc
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+  name: qrcode-service
+spec:
+  selector:
+    app: qrcode
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: qrcode-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: qrcode.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: qrcode-service
+                port:
+                  number: 80

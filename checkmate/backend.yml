@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkmate-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: checkmate-server
+  template:
+    metadata:
+      labels:
+        app: checkmate-server
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: checkmate-server
+          image: ghcr.io/bluewave-labs/checkmate-backend:latest
+          ports:
+            - containerPort: 52345
+          env:
+            - name: CLIENT_HOST
+              value: http://checkmate.xyz.abc
+            - name: JWT_SECRET
+              value: wBmf0aHdHcPCC1SzX4kUFsDgsCDCpQ37
+            - name: DB_CONNECTION_STRING
+              value: mongodb://checkmate:passme@db.server.com:27017/checkmate_uptime_db
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkmate-server-service
+spec:
+  selector:
+    app: checkmate-server
+  ports:
+    - protocol: TCP
+      port: 52345
+      targetPort: 52345
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: checkmate-server-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: checkmate-server.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: checkmate-server-service
+                port:
+                  number: 52345

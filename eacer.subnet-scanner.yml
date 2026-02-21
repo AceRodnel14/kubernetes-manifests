@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subnet-scanner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: subnet-scanner
+  template:
+    metadata:
+      labels:
+        app: subnet-scanner
+    spec:
+      volumes:
+        - name: icon-volume
+          emptyDir: {}
+      initContainers:
+        - name: fetch-file
+          image: curlimages/curl
+          command: ["sh", "-c", "curl -o /data/favicon.png http://cdn.xyz.abc/logos/ipquestionmark.png"]
+          volumeMounts:
+            - name: icon-volume
+              mountPath: /data
+      containers:
+        - name: subnet-scanner
+          image: eacer/subnet-scanner:latest
+          #image: eacer/subnet-scanner:251212051041
+          ports:
+            - containerPort: 80
+          env:
+            - name: PORT
+              value: '8080'
+            - name: DEFAULT_SUBNET
+              value: 10.14.1.0/24
+            - name: ICON
+              value: /app/favicon.png
+          volumeMounts:
+            - name: icon-volume
+              mountPath: /app/favicon.png
+              subPath: favicon.png
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+  name: subnet-scanner-service
+spec:
+  selector:
+    app: subnet-scanner
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: subnet-scanner-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: need-ip.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: subnet-scanner-service
+                port:
+                  number: 8080

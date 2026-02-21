@@ -1,0 +1,94 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: checkmate-nginx-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/checkmate/nginx
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: checkmate-nginx-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: checkmate-nginx-pv
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkmate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: checkmate
+  template:
+    metadata:
+      labels:
+        app: checkmate
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: checkmate
+          image: ghcr.io/bluewave-labs/checkmate-client:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: UPTIME_APP_API_BASE_URL
+              value: http://checkmate-server.xyz.abc/api/v1
+            - name: UPTIME_APP_CLIENT_HOST
+              value: http://checkmate.xyz.abc
+          volumeMounts:
+            - name: nginx-volume
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+      volumes:
+        - name: nginx-volume
+          persistentVolumeClaim:
+            claimName: checkmate-nginx-pvc
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkmate-service
+spec:
+  selector:
+    app: checkmate
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: checkmate-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: checkmate.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: checkmate-service
+                port:
+                  number: 80

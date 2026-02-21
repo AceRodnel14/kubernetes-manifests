@@ -1,0 +1,136 @@
+# Persistent Volumes and Claims
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: homepage-config-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/homepage/config
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homepage-config-pvc
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: homepage-config-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: homepage-icons-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/homepage/icons
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homepage-icons-pvc
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: homepage-icons-pv
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homepage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homepage
+  template:
+    metadata:
+      labels:
+        app: homepage
+    spec:
+      containers:
+        - name: homepage
+          image: ghcr.io/gethomepage/homepage:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: HOMEPAGE_ALLOWED_HOSTS
+              value: 111.11.1.111,pc.xyz.abc
+            - name: LOG_TARGETS
+              value: stdout
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+              readOnly: true
+            - name: icons-volume
+              mountPath: /app/public/icons
+              readOnly: true
+      volumes:
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: homepage-config-pvc
+        - name: icons-volume
+          persistentVolumeClaim:
+            claimName: homepage-icons-pvc
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+  name: homepage-service
+spec:
+  selector:
+    app: homepage
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+#---
+## Traefik Middleware: strip `/homepage/` prefix
+#apiVersion: traefik.io/v1alpha1
+#kind: Middleware
+#metadata:
+#  name: strip-homepage
+#spec:
+#  stripPrefix:
+#    prefixes:
+#      - /homepage
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homepage-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    # traefik.ingress.kubernetes.io/router.middlewares: default-strip-homepage@kubernetescrd
+spec:
+  rules:
+    - host: pc.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: homepage-service
+                port:
+                  number: 3000

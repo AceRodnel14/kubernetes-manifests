@@ -1,0 +1,106 @@
+# Persistent Volumes and Claims
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: firefox-config-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/firefox
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: firefox-config-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: firefox-config-pv
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: firefox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: firefox
+  template:
+    metadata:
+      labels:
+        app: firefox
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: firefox
+          image: jlesage/firefox
+          ports:
+            - containerPort: 5800
+          env:
+            - name: TZ
+              value: Asia/Manila
+            - name: DARK_MODE
+              value: '1'
+            - name: FF_OPEN_URL
+              value: http://pc.xyz.abc/
+            - name: USER_ID
+              value: '0'
+            - name: GROUP_ID
+              value: '0'
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+              readOnly: false
+      volumes:
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: firefox-config-pvc
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+  name: firefox-service
+spec:
+  selector:
+    app: firefox
+  ports:
+    - protocol: TCP
+      port: 5800
+      targetPort: 5800
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: firefox-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  tls:
+    - hosts:
+        - firefox.xyz.abc
+      secretName: homelab-tls
+  rules:
+    - host: firefox.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: firefox-service
+                port:
+                  number: 5800

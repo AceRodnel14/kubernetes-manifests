@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mazanoke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mazanoke
+  template:
+    metadata:
+      labels:
+        app: mazanoke
+    spec:
+      containers:
+        - name: mazanoke
+          image: ghcr.io/civilblur/mazanoke:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mazanoke-service
+spec:
+  selector:
+    app: mazanoke
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mazanoke-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: mazanoke.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mazanoke-service
+                port:
+                  number: 80

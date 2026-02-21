@@ -1,0 +1,61 @@
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: firefox
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: firefox
+ template:
+   metadata:
+     labels:
+       app: firefox
+   spec:
+     containers:
+       - name: firefox
+         image: jlesage/firefox
+         ports:
+           - containerPort: 5800
+         env:
+           - name: TZ
+             value: Asia/Manila
+           - name: DARK_MODE
+             value: '1'
+           - name: FF_OPEN_URL
+             value: http://pc.xyz.abc/
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+ name: firefox-service
+spec:
+ selector:
+   app: firefox
+ ports:
+   - protocol: TCP
+     port: 5800
+     targetPort: 5800
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+ name: firefox-ingress
+ annotations:
+   traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+ rules:
+   - host: firefox.xyz.abc
+     http:
+       paths:
+         - path: /
+           pathType: Prefix
+           backend:
+             service:
+               name: firefox-service
+               port:
+                 number: 5800

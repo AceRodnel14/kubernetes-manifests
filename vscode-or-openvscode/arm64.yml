@@ -1,0 +1,137 @@
+# Persistent Volumes and Claims
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: codearm-config-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/code/config
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: codearm-config-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: codearm-config-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: codearm-workspace-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/code/workspace
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: codearm-workspace-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: codearm-workspace-pv
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codearm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: codearm
+  template:
+    metadata:
+      labels:
+        app: codearm
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      containers:
+        - name: codearm
+          image: linuxserver/code-server
+          ports:
+            - containerPort: 8443
+          env:
+            - name: PROXY_DOMAIN
+              value: codearm.xyz.abc
+            - name: DEFAULT_WORKSPACE
+              value: /workspace
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+            - name: TZ
+              value: Asia/Manila
+            - name: PASSWORD
+              value: 'passme@'
+            - name: SUDO_PASSWORD
+              value: 'passme!ng@est'
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+              readOnly: false
+            - name: workspace-volume
+              mountPath: /workspace
+              readOnly: false
+      volumes:
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: codearm-config-pvc
+        - name: workspace-volume
+          persistentVolumeClaim:
+            claimName: codearm-workspace-pvc
+---
+# ClusterIP Service (internal only, Traefik will route)
+apiVersion: v1
+kind: Service
+metadata:
+  name: codearm-service
+spec:
+  selector:
+    app: codearm
+  ports:
+    - protocol: TCP
+      port: 8443
+      targetPort: 8443
+---
+# Ingress for Traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: codearm-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: codearm.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: codearm-service
+                port:
+                  number: 8443

@@ -1,0 +1,9 @@
+include:
+  - project: 'acerodnel/gitlab-actions'
+    file: 'templates/sync_to_github_remove_sensitive.yml'
+
+stages:
+  - validate
+  - build
+  - sync
+  - cleanup
