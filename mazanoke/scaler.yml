@@ -1,0 +1,15 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: mazanoke-http
+  namespace: default
+spec:
+  hosts:
+    - mazanoke.xyz.abc
+  scaleTargetRef:
+    name: mazanoke
+    service: mazanoke-service
+    port: 80
+  replicas:
+    min: 0
+    max: 1
