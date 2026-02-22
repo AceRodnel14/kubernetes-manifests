@@ -1,0 +1,15 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: codeamd-http
+  namespace: default
+spec:
+  hosts:
+    - code.xyz.abc
+  scaleTargetRef:
+    name: codeamd
+    service: codeamd-service
+    port: 3000
+  replicas:
+    min: 0
+    max: 1

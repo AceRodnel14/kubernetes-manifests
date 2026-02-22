@@ -1,0 +1,52 @@
+# Persistent Volumes and Claims
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: codeamd-config-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/code/config
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: codeamd-config-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: codeamd-config-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: codeamd-workspace-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/code/workspace
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: codeamd-workspace-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: codeamd-workspace-pv

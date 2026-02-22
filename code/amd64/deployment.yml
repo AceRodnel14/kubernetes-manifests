@@ -1,0 +1,49 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codeamd
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: codeamd
+  template:
+    metadata:
+      labels:
+        app: codeamd
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: codeamd
+          image: linuxserver/openvscode-server:1.109.5
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PROXY_DOMAIN
+              value: code.xyz.abc
+            - name: DEFAULT_WORKSPACE
+              value: /workspace
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+            - name: TZ
+              value: Asia/Manila
+            - name: SUDO_PASSWORD
+              value: 'passme!ng@est'
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+              readOnly: false
+            - name: workspace-volume
+              mountPath: /workspace
+              readOnly: false
+      volumes:
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: codeamd-config-pvc
+        - name: workspace-volume
+          persistentVolumeClaim:
+            claimName: codeamd-workspace-pvc
