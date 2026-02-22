@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: termix
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: termix
+  template:
+    metadata:
+      labels:
+        app: termix
+    spec:
+      containers:
+        - name: termix
+          image: ghcr.io/lukegus/termix:release-1.11.1
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: data-volume
+              mountPath: /app/data
+              readOnly: false
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: termix-data-pvc

@@ -1,16 +1,16 @@
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
 metadata:
-  name: CHANGEME-http
+  name: subnet-scanner-http
   namespace: default
 spec:
   hosts:
-    - CHANGEME.xyz.abc
+    - need-ip.xyz.abc
   scaleTargetRef:
-    name: CHANGEME
-    service: CHANGEME-service
-    port: CHANGEPORT
+    name: subnet-scanner
+    service: subnet-scanner-service
+    port: 8080
   replicas:
     min: 0
     max: 1
-  scaledownPeriod: 1800
+  scaledownPeriod: 300

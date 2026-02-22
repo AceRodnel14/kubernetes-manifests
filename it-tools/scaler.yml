@@ -1,16 +1,16 @@
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
 metadata:
-  name: CHANGEME-http
+  name: it-tools-http
   namespace: default
 spec:
   hosts:
-    - CHANGEME.xyz.abc
+    - it-tools.xyz.abc
   scaleTargetRef:
-    name: CHANGEME
-    service: CHANGEME-service
-    port: CHANGEPORT
+    name: it-tools
+    service: it-tools-service
+    port: 80
   replicas:
     min: 0
     max: 1
-  scaledownPeriod: 1800
+  scaledownPeriod: 300

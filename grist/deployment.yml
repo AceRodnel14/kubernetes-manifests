@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grist
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: grist
+  template:
+    metadata:
+      labels:
+        app: grist
+    spec:
+      containers:
+        - name: grist
+          image: gristlabs/grist:latest
+          ports:
+            - containerPort: 8484
+          env:
+            - name: GRIST_SESSION_SECRET
+              value: ThislsReaLLYS3cr3t
+            - name: GRIST_DEFAULT_EMAIL
+              value: admin@homelab
+            - name: APP_HOME_URL
+              value: https://grist.xyz.abc
+          volumeMounts:
+            - name: data-volume
+              mountPath: /persist
+              readOnly: false
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: grist-data-pvc

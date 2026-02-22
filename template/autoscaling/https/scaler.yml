@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   hosts:
-    - code.xyz.abc
+    - CHANGEME.xyz.abc
   scaleTargetRef:
     name: CHANGEME
     service: CHANGEME-service

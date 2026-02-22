@@ -1,25 +1,25 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: CHANGEME-data-pv
+  name: termix-data-pv
 spec:
   capacity:
-    storage: 20Gi
+    storage: 5Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   nfs:
     server: nfs.smb.com
-    path: /mnt/ssd/hdd/CHANGEME/data
+    path: /mnt/ssd/hdd/termix
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: CHANGEME-data-pvc
+  name: termix-data-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 20Gi
-  volumeName: CHANGEME-data-pv
+      storage: 5Gi
+  volumeName: termix-data-pv

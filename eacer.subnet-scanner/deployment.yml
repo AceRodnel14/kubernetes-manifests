@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,9 +25,8 @@ spec:
       containers:
         - name: subnet-scanner
           image: eacer/subnet-scanner:latest
-          #image: eacer/subnet-scanner:251212051041
           ports:
-            - containerPort: 80
+            - containerPort: 8080
           env:
             - name: PORT
               value: '8080'
@@ -40,36 +38,3 @@ spec:
             - name: icon-volume
               mountPath: /app/favicon.png
               subPath: favicon.png
----
-# ClusterIP Service (internal only, Traefik will route)
-apiVersion: v1
-kind: Service
-metadata:
-  name: subnet-scanner-service
-spec:
-  selector:
-    app: subnet-scanner
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
----
-# Ingress for Traefik
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: subnet-scanner-ingress
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
-spec:
-  rules:
-    - host: need-ip.xyz.abc
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: subnet-scanner-service
-                port:
-                  number: 8080
