@@ -1,0 +1,26 @@
+# Persistent Volumes and Claims
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: CHANGEME-data-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/CHANGEME/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: CHANGEME-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: CHANGEME-data-pv

@@ -13,3 +13,4 @@ spec:
   replicas:
     min: 0
     max: 1
+  scaledownPeriod: 3600

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+ name: CHANGEME-service
+spec:
+ selector:
+   app: CHANGEME
+ ports:
+   - protocol: TCP
+     port: CHANGEPORT
+     targetPort: CHANGEPORT

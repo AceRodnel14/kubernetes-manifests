@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: CHANGEME
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: CHANGEME
+ template:
+   metadata:
+     labels:
+       app: CHANGEME
+   spec:
+     containers:
+       - name: CHANGEME
+         image: grafana/grafana-enterprise:12.3.3
+         ports:
+           - containerPort: CHANGEPORT
+         env:
+           - name: GF_SERVER_DOMAIN
+             value: CHANGEME.xyz.abc
+         volumeMounts:
+           - name: data-volume
+             mountPath: /var/lib/grafana
+             readOnly: false
+     dnsPolicy: "None"
+     dnsConfig:
+       nameservers:
+         - 9.9.9.9
+         - 192.192.188.1
+     volumes:
+       - name: data-volume
+         persistentVolumeClaim:
+           claimName: CHANGEME-data-pvc

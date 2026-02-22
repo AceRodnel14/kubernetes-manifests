@@ -1,15 +1,15 @@
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
 metadata:
-  name: adminer-http
+  name: codearm-http
   namespace: default
 spec:
   hosts:
-    - adminer.xyz.abc
+    - codearm.xyz.abc
   scaleTargetRef:
-    name: adminer
-    service: adminer-service
-    port: 8080
+    name: codearm
+    service: codearm-service
+    port: 3000
   replicas:
     min: 0
     max: 1

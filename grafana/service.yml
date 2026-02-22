@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+ name: grafana-web-service
+spec:
+ selector:
+   app: grafana-web
+ ports:
+   - protocol: TCP
+     port: 3000
+     targetPort: 3000

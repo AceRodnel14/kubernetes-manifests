@@ -1,0 +1,33 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: CHANGEME
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: CHANGEME
+  template:
+    metadata:
+      labels:
+        app: CHANGEME
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: CHANGEME
+          image: linuxserver/openvscode-server:1.109.5
+          ports:
+            - containerPort: CHANGEPORT
+          env:
+            - name: PROXY_DOMAIN
+              value: CHANGEME.xyz.abc
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+              readOnly: false
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: CHANGEME-data-pvc

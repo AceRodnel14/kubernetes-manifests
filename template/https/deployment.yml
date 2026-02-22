@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: CHANGEME
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: CHANGEME
+  template:
+    metadata:
+      labels:
+        app: CHANGEME
+    spec:
+      containers:
+        - name: CHANGEME
+          image: triliumnext/trilium:v0.101.3
+          ports:
+            - containerPort: CHANGEPORT
+          env:
+            - name: CHANGEME_DATA_DIR
+              value: /home/node/trilium-data
+          volumeMounts:
+            - name: data-volume
+              mountPath: /home/node/trilium-data
+              readOnly: false
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: CHANGEME-data-pvc

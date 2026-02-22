@@ -1,15 +1,15 @@
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
 metadata:
-  name: adminer-http
+  name: CHANGEME-http
   namespace: default
 spec:
   hosts:
-    - adminer.xyz.abc
+    - code.xyz.abc
   scaleTargetRef:
-    name: adminer
-    service: adminer-service
-    port: 8080
+    name: CHANGEME
+    service: CHANGEME-service
+    port: CHANGEPORT
   replicas:
     min: 0
     max: 1
