@@ -19,4 +19,4 @@ spec:
             - containerPort: 3000
           env:
             - name: MONGO_URI
-              value: 'mongodb://watcher:passme@db.server.com:27017/watchlist_kr'
+              value: 'mongodb://watcher:passme@db.server.com:27017/watchlist_kr?authSource=admin'
