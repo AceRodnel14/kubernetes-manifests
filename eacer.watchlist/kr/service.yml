@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: watchlist-kr-service
+spec:
+  selector:
+    app: watchlist-kr
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000

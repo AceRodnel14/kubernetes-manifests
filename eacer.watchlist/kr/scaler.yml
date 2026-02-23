@@ -1,0 +1,16 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: watchlist-kr-http
+  namespace: default
+spec:
+  hosts:
+    - watchkr.xyz.abc
+  scaleTargetRef:
+    name: watchlist-kr
+    service: watchlist-kr-service
+    port: 3000
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 300

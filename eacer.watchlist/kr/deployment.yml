@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: watchlist-kr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: watchlist-kr
+  template:
+    metadata:
+      labels:
+        app: watchlist-kr
+    spec:
+      containers:
+        - name: watchlist-kr
+          image: eacer/watchlist:main
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_URI
+              value: 'mongodb://watcher:passme@db.server.com:27017/watchlist_kr'
