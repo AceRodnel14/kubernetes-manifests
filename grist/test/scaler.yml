@@ -1,0 +1,16 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: grist-http
+  namespace: default
+spec:
+  hosts:
+    - grist.xyz.abc
+  scaleTargetRef:
+    name: grist
+    service: grist-service
+    port: 8484
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 1800
