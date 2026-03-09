@@ -18,6 +18,10 @@ spec:
           ports:
             - containerPort: 8484
           env:
+            - name: GRIST_FORWARD_AUTH_HEADER
+              value: X-Forwarded-User
+            - name: GRIST_ORG_IN_PATH
+              value: "true"
             - name: GRIST_SESSION_SECRET
               value: ThislsReaLLYS3cr3t
             - name: GRIST_DEFAULT_EMAIL
