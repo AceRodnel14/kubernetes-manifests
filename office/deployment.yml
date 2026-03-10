@@ -1,0 +1,37 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: office
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: office
+  template:
+    metadata:
+      labels:
+        app: office
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: office
+          image: linuxserver/libreoffice:25.8.1
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+            - name: TZ
+              value: Asia/Manila
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+              readOnly: false
+      volumes:
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: office-config-pvc
