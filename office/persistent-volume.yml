@@ -11,7 +11,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     server: nfs.smb.com
-    path: /mnt/ssd/hdd/office/config
+    path: /mnt/ssd/hdd/office
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

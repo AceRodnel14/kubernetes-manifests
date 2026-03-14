@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: headlamp-data-pv
+spec:
+ capacity:
+   storage: 20Gi
+ accessModes:
+   - ReadWriteOnce
+ persistentVolumeReclaimPolicy: Retain
+ nfs:
+   server: nfs.smb.com
+   path: /mnt/ssd/hdd/headlamp
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: headlamp-data-pvc
+ namespace: kube-system
+spec:
+ accessModes:
+   - ReadWriteOnce
+ resources:
+   requests:
+     storage: 20Gi
+ volumeName: headlamp-data-pv

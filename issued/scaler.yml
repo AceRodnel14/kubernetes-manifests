@@ -1,0 +1,16 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: mangareader-http
+  namespace: default
+spec:
+  hosts:
+    - mngrdr.xyz.abc
+  scaleTargetRef:
+    name: mangareader
+    service: mangareader-service
+    port: 8181
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 3600

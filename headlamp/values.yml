@@ -1,0 +1,29 @@
+config:
+  pluginsDir: /build/plugins
+  kubeconfig: ""
+initContainers:
+  - command:
+      - /bin/sh
+      - '-c'
+      - mkdir -p /build/plugins && cp -r /plugins/* /build/plugins/
+    image: quay.io/kubescape/headlamp-plugin:v0.10.5
+    name: kubescape-plugin
+    volumeMounts:
+      - mountPath: /build/plugins
+        name: headlamp-plugins
+  - command:
+      - /bin/sh
+      - '-c'
+      - mkdir -p /build/plugins && cp -r /plugins/* /build/plugins/
+    image: ghcr.io/kubebeam/trivy-headlamp-plugin:v0.3.1
+    name: trivy-plugin
+    volumeMounts:
+      - mountPath: /build/plugins
+        name: headlamp-plugins
+volumeMounts:
+  - name: headlamp-plugins
+    mountPath: /build/plugins
+volumes:
+  - name: headlamp-plugins
+    persistentVolumeClaim:
+      claimName: headlamp-data-pvc

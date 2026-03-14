@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mangareader-service
+spec:
+  selector:
+    app: mangareader
+  ports:
+    - protocol: TCP
+      port: 8181
+      targetPort: 8181

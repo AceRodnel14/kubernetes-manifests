@@ -1,0 +1,52 @@
+# Persistent Volumes and Claims
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mangareader-config-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/mngrdr/config
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mangareader-config-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: mangareader-config-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mangareader-data-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/mngrdr/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mangareader-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: mangareader-data-pv
