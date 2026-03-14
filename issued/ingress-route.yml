@@ -1,13 +1,13 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: mangareader-route
+  name: issued-route
   namespace: default
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`mngrdr.xyz.abc`)
+    - match: Host(`issued.xyz.abc`)
       kind: Rule
       services:
         - name: keda-add-ons-http-interceptor-proxy

@@ -1,14 +1,14 @@
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
 metadata:
-  name: mangareader-http
+  name: issued-http
   namespace: default
 spec:
   hosts:
-    - mngrdr.xyz.abc
+    - issued.xyz.abc
   scaleTargetRef:
-    name: mangareader
-    service: mangareader-service
+    name: issued
+    service: issued-service
     port: 8181
   replicas:
     min: 0

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mangareader-config-pv
+  name: issued-config-pv
 spec:
   capacity:
     storage: 20Gi
@@ -16,19 +16,19 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mangareader-config-pvc
+  name: issued-config-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 20Gi
-  volumeName: mangareader-config-pv
+  volumeName: issued-config-pv
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mangareader-data-pv
+  name: issued-data-pv
 spec:
   capacity:
     storage: 20Gi
@@ -42,11 +42,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mangareader-data-pvc
+  name: issued-data-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 20Gi
-  volumeName: mangareader-data-pv
+  volumeName: issued-data-pv

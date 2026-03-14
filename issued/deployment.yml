@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mangareader
+  name: issued
 spec:
   replicas: 0
   selector:
     matchLabels:
-      app: mangareader
+      app: issued
   template:
     metadata:
       labels:
-        app: mangareader
+        app: issued
     spec:
       # nodeSelector:
       #   kubernetes.io/arch: amd64
       containers:
-        - name: mangareader
+        - name: issued
           image: ghcr.io/metalogico/issued:0.1.1
           ports:
             - containerPort: 8181
@@ -30,7 +30,7 @@ spec:
       volumes:
         - name: config-volume
           persistentVolumeClaim:
-            claimName: mangareader-config-pvc
+            claimName: issued-config-pvc
         - name: data-volume
           persistentVolumeClaim:
-            claimName: mangareader-data-pvc
+            claimName: issued-data-pvc
