@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ncbkp-work
+spec:
+  schedule: "0 1 * * *"
+  timeZone: "Asia/Manila"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          nodeSelector:
+            kubernetes.io/arch: amd64
+          containers:
+            - name: ncbkp-work
+              image: eacer/prebuilt-playwright:main
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  cd /appdata &&
+                  node /appdata/work.js
+              volumeMounts:
+                - name: ncbkp-storage
+                  mountPath: /appdata
+          volumes:
+            - name: ncbkp-storage
+              persistentVolumeClaim:
+                claimName: ncbkp-data-pvc
