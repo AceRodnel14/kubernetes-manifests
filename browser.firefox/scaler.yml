@@ -1,0 +1,16 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: firefox-http
+  namespace: default
+spec:
+  hosts:
+    - firefox.xyz.abc
+  scaleTargetRef:
+    name: firefox
+    service: firefox-service
+    port: 3000
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 3600

@@ -1,0 +1,39 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chromium
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: chromium
+  template:
+    metadata:
+      labels:
+        app: chromium
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: chromium
+          image: linuxserver/chromium:version-baf94ebf
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+            - name: TZ
+              value: Asia/Manila
+            - name: CHROME_CLI
+              value: http://pc.xyz.abc/
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+              readOnly: false
+      volumes:
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: chromium-config-pvc
