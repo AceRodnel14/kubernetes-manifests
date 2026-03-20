@@ -1,15 +1,18 @@
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: paperless-web-route
-  namespace: default
+  name: paperless-web-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
-  entryPoints:
-    - web
-  routes:
-    - match: Host(`paperless.xyz.abc`)
-      kind: Rule
-      services:
-        - name: keda-add-ons-http-interceptor-proxy
-          namespace: keda
-          port: 8080
+  rules:
+    - host: paperless.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: paperless-web-service
+                port:
+                  number: 8000
