@@ -39,6 +39,8 @@ spec:
               value: db.server.com
             - name: PAPERLESS_DBPASS
               value: passme
+            - name: PAPERLESS_URL
+              value: http://paperless.xyz.abc
           volumeMounts:
             - name: data-volume
               mountPath: /usr/src/paperless/data

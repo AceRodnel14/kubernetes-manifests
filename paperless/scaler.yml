@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   hosts:
-    - code.xyz.abc
+    - paperless.xyz.abc
   scaleTargetRef:
     name: paperless-web
     service: paperless-web-service
