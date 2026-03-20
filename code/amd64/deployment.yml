@@ -17,13 +17,13 @@ spec:
         kubernetes.io/arch: amd64
       initContainers:
         - name: patch-s6
-          image: linuxserver/openvscode-server:1.109.5
+          image: linuxserver/code-server:4.112.0
           command:
             - sh
             - -c
             - |
               echo "Copying s6 init directory..."
-              cp -r /etc/s6-overlay/s6-rc.d/init-openvscode-server/* /patched/
+              cp -r /etc/s6-overlay/s6-rc.d/init-code-server/* /patched/
 
               echo "Commenting out lines..."
               sed -i 's/^find /#find /' /patched/run
@@ -34,12 +34,10 @@ spec:
               mountPath: /patched
       containers:
         - name: codeamd
-          image: linuxserver/openvscode-server:1.109.5
+          image: linuxserver/code-server:4.112.0
           ports:
-            - containerPort: 3000
+            - containerPort: 8443
           env:
-            - name: PROXY_DOMAIN
-              value: code.xyz.abc
             - name: DEFAULT_WORKSPACE
               value: /workspace
             - name: PUID
@@ -52,7 +50,7 @@ spec:
               value: 'passme!ng@est'
           volumeMounts:
             - name: s6-patch
-              mountPath: /etc/s6-overlay/s6-rc.d/init-openvscode-server
+              mountPath: /etc/s6-overlay/s6-rc.d/init-code-server
             - name: config-volume
               mountPath: /config
               readOnly: false

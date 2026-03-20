@@ -1,0 +1,67 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless-web
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: paperless-web
+  template:
+    metadata:
+      labels:
+        app: paperless-web
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      initContainers:
+        - name: wait-for-redis
+          image: redis:8.6.1
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Redis..."
+              until redis-cli -h paperless-redis-service ping | grep PONG; do
+                sleep 2
+              done
+              echo "Redis is ready!"
+      containers:
+        - name: paperless-web
+          image: ghcr.io/paperless-ngx/paperless-ngx:2.20.11
+          ports:
+            - containerPort: 8000
+          env:
+            - name: PAPERLESS_REDIS
+              value: redis://paperless-redis-service:6379
+            - name: PAPERLESS_DBHOST
+              value: db.server.com
+            - name: PAPERLESS_DBPASS
+              value: passme
+          volumeMounts:
+            - name: data-volume
+              mountPath: /usr/src/paperless/data
+              readOnly: false
+            - name: media-volume
+              mountPath: /usr/src/paperless/media
+              readOnly: false
+            - name: export-volume
+              mountPath: /usr/src/paperless/export
+              readOnly: false
+            - name: consume-volume
+              mountPath: /usr/src/paperless/consume
+              readOnly: false
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: paperless-web-data-pvc
+        - name: media-volume
+          persistentVolumeClaim:
+            claimName: paperless-web-media-pvc
+        - name: export-volume
+          persistentVolumeClaim:
+            claimName: paperless-web-export-pvc
+        - name: consume-volume
+          persistentVolumeClaim:
+            claimName: paperless-web-consume-pvc

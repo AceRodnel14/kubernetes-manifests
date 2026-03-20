@@ -1,0 +1,131 @@
+# Persistent Volumes and Claims
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: paperless-web-data-pv
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/paperless-web/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-web-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  volumeName: paperless-web-data-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: paperless-web-media-pv
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/paperless-web/media
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-web-media-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  volumeName: paperless-web-media-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: paperless-web-export-pv
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/paperless-web/export
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-web-export-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  volumeName: paperless-web-export-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: paperless-web-consume-pv
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/paperless-web/consume
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-web-consume-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  volumeName: paperless-web-consume-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: paperless-redis-pv
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs.smb.com
+    path: /mnt/ssd/hdd/paperless-redis
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-redis-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  volumeName: paperless-redis-pv
+---

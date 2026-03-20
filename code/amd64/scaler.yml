@@ -9,7 +9,7 @@ spec:
   scaleTargetRef:
     name: codeamd
     service: codeamd-service
-    port: 3000
+    port: 8443
   replicas:
     min: 0
     max: 1

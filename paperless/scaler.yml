@@ -1,16 +1,16 @@
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
 metadata:
-  name: codearm-http
+  name: paperless-web-http
   namespace: default
 spec:
   hosts:
-    - codearm.xyz.abc
+    - code.xyz.abc
   scaleTargetRef:
-    name: codearm
-    service: codearm-service
-    port: 8443
+    name: paperless-web
+    service: paperless-web-service
+    port: 8000
   replicas:
     min: 0
     max: 1
-  scaledownPeriod: 1800
+  scaledownPeriod: 3600

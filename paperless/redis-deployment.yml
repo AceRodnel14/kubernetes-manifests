@@ -1,0 +1,30 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paperless-redis
+  template:
+    metadata:
+      labels:
+        app: paperless-redis
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      containers:
+        - name: paperless-redis
+          image: redis:8.6.1
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+              readOnly: false
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: paperless-redis-pvc
