@@ -3,8 +3,13 @@ kind: Ingress
 metadata:
   name: paperless-web-ingress
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
+  tls:
+    - hosts:
+        - paperless.xyz.abc
+      secretName: homelab-tls
   rules:
     - host: paperless.xyz.abc
       http:
