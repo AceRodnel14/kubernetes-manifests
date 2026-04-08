@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hoppscotch-service
+spec:
+  selector:
+    app: hoppscotch
+  ports:
+    - name: frontend
+      port: 3000
+      targetPort: 3000
+
+    - name: admin
+      port: 3100
+      targetPort: 3100
+
+    - name: api
+      port: 3170
+      targetPort: 3170

@@ -1,4 +1,5 @@
 grafana:
+#  replicas: 1
   enabled: false
 
 prometheus:
@@ -16,6 +17,10 @@ prometheus:
       - name: prometheus-storage
         persistentVolumeClaim:
           claimName: prometheus-data-pvc
+    additionalScrapeConfigsSecret:
+      enabled: true
+      name: additional-configs
+      key: extra-configs.yml
 
 alertmanager:
   enabled: true

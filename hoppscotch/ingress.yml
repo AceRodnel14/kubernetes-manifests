@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hoppscotch-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  tls:
+    - hosts:
+        - admin-hoppscotch.xyz.abc
+        - api-hoppscotch.xyz.abc
+      secretName: homelab-tls
+
+  rules:
+    - host: admin-hoppscotch.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hoppscotch-service
+                port:
+                  name: admin
+
+    - host: api-hoppscotch.xyz.abc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hoppscotch-service
+                port:
+                  name: api

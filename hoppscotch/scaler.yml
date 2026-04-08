@@ -1,0 +1,16 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: hoppscotch-http
+  namespace: default
+spec:
+  hosts:
+    - hoppscotch.xyz.abc
+  scaleTargetRef:
+    name: hoppscotch
+    service: hoppscotch-service
+    port: 3000
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 1800
