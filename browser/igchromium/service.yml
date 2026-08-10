@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: igchromium-service
+spec:
+  selector:
+    app: igchromium
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000

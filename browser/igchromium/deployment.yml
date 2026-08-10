@@ -1,0 +1,55 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: igchromium
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: igchromium
+  template:
+    metadata:
+      labels:
+        app: igchromium
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: igchromium
+          image: linuxserver/chromium:version-3d7cd855
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+            - name: TZ
+              value: Asia/Manila
+            - name: CHROME_CLI
+              value: http://pc.xyz.abc/
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+              readOnly: false
+        - name: termpyfilebrowser-sidecar
+          image: eacer/custom-termpyfilebrowser:main-260802223655
+          ports:
+            - name: ttyd-port
+              containerPort: 7681
+            - name: filebrowser-port
+              containerPort: 8080
+          env:
+            - name: TZ
+              value: Asia/Manila
+            - name: WORKDIR_PATH
+              value: /config
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+              readOnly: false
+      volumes:
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: igchromium-config-pvc

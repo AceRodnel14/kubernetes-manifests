@@ -1,0 +1,16 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: igchromium-http
+  namespace: default
+spec:
+  hosts:
+    - igigchromium.xyz.abc
+  scaleTargetRef:
+    name: igchromium
+    service: igchromium-service
+    port: 3000
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 3600
