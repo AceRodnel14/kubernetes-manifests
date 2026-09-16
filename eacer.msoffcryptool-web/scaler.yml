@@ -4,7 +4,8 @@ metadata:
   name: msoffcryptool-web
   namespace: default
 spec:
-  host: docucrypt.xyz.abc  # CHANGEME: same domain as ingress-route.yml
+  hosts: 
+    - docucrypt.xyz.abc  # CHANGEME: same domain as ingress-route.yml
   scaleTargetRef:
     service: msoffcryptool-web-service
     port: 8000
