@@ -20,6 +20,7 @@ spec:
       containers:
         - name: msoffcryptool-web
           image: eacer/msoffcryptool-web:main  # CHANGEME: your built/pushed image
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           resources:
