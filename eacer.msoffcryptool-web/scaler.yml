@@ -1,16 +1,14 @@
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
 metadata:
-  name: CHANGEME-http
+  name: msoffcryptool-web
   namespace: default
 spec:
-  hosts:
-    - CHANGEME.xyz.abc
+  host: docucrypt.xyz.abc  # CHANGEME: same domain as ingress-route.yml
   scaleTargetRef:
-    name: CHANGEME
-    service: CHANGEME-service
-    port: CHANGEPORT
+    service: msoffcryptool-web-service
+    port: 8000
   replicas:
     min: 0
     max: 1
-  scaledownPeriod: 1800
+  scaledownPeriod: 1800  # 30 min idle -> scale to zero

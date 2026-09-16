@@ -1,32 +1,49 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: CHANGEME
+  name: msoffcryptool-web
+  namespace: default
+  labels:
+    app: msoffcryptool-web
 spec:
-  replicas: 0
+  replicas: 0  # KEDA's HTTPScaledObject drives this from here — start at zero
   selector:
     matchLabels:
-      app: CHANGEME
+      app: msoffcryptool-web
   template:
     metadata:
       labels:
-        app: CHANGEME
+        app: msoffcryptool-web
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
       containers:
-        - name: CHANGEME
-          image: linuxserver/openvscode-server:1.109.5
+        - name: msoffcryptool-web
+          image: eacer/msoffcryptool-web:main  # CHANGEME: your built/pushed image
           ports:
-            - containerPort: CHANGEPORT
-          env:
-            - name: PROXY_DOMAIN
-              value: CHANGEME.xyz.abc
-          volumeMounts:
-            - name: data-volume
-              mountPath: /data
-              readOnly: false
-      volumes:
-        - name: data-volume
-          persistentVolumeClaim:
-            claimName: CHANGEME-data-pvc
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+              ephemeral-storage: "50Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+              ephemeral-storage: "200Mi"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 15
+      # Deliberately no volumes/volumeMounts here — the app only ever writes
+      # to its own container-local temp dir (see app/main.py: _new_tmpdir()),
+      # which is cleaned up per-request and disappears with the pod on
+      # scale-to-zero. No PVC/PV needed for this app.
