@@ -38,7 +38,7 @@ spec:
           ports:
             - name: ttyd-port
               containerPort: 7681
-            - name: filebrowser-port
+            - name: fileb-port
               containerPort: 8080
           env:
             - name: TZ
