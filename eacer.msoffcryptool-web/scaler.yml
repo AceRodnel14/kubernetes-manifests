@@ -7,6 +7,7 @@ spec:
   hosts: 
     - docucrypt.xyz.abc  # CHANGEME: same domain as ingress-route.yml
   scaleTargetRef:
+    name: msoffcryptool-web
     service: msoffcryptool-web-service
     port: 8000
   replicas:
