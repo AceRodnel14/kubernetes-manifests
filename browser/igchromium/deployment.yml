@@ -16,9 +16,39 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
+      initContainers:
+        # Fetch the custom icon. Uses the same (already pulled) image so the
+        # stock icon is copied first as a fallback: if the CDN is down the
+        # pod still starts, just with the default Chromium icon.
+        - name: fetch-icon
+          image: linuxserver/chromium:version-627c19be
+          command:
+            - /bin/sh
+            - -c
+            - |
+              cp /usr/share/selkies/www/icon.png /icon/icon.png
+              if curl -fsSL --connect-timeout 3 --max-time 10 \
+                   -o /icon/icon.png.tmp "$ICON_URL"; then
+                mv /icon/icon.png.tmp /icon/icon.png
+                echo "custom icon fetched from $ICON_URL"
+              else
+                echo "could not fetch $ICON_URL, keeping stock icon"
+              fi
+          env:
+            - name: ICON_URL
+              value: http://cdn.xyz.abc/logos/igchromebot.png
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+          volumeMounts:
+            - name: icon
+              mountPath: /icon
       containers:
         - name: igchromium
-          image: linuxserver/chromium:version-3d7cd855
+          image: linuxserver/chromium:version-627c19be
           ports:
             - containerPort: 3000
           env:
@@ -28,9 +58,15 @@ spec:
               value: '1000'
             - name: TZ
               value: Asia/Manila
+            # Browser tab title and PWA name (image default: Chromium)
+            - name: TITLE
+              value: igchromium
+            # Space-separated URLs open as separate tabs.
+            # Tab 2/3 reach the internal-only termpyfilebrowser Service.
             - name: CHROME_CLI
               value: >-
                 http://pc.xyz.abc/
+                https://www.instagram.com/
                 http://termpyfilebrowser-service.default.svc.cluster.local:8080/
                 http://termpyfilebrowser-service.default.svc.cluster.local:7681/
           readinessProbe:
@@ -49,7 +85,16 @@ spec:
               mountPath: /config
             - name: dshm
               mountPath: /dev/shm
+            # Custom icon: copied at startup to favicon.ico, icon.png and
+            # the PWA manifest icon by the Selkies init script.
+            - name: icon
+              mountPath: /usr/share/selkies/www/icon.png
+              subPath: icon.png
+              readOnly: true
       volumes:
+        - name: icon
+          emptyDir:
+            sizeLimit: 5Mi
         - name: config-volume
           persistentVolumeClaim:
             claimName: igchromium-config-pvc

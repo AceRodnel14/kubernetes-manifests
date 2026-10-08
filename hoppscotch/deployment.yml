@@ -14,7 +14,7 @@ spec:
    spec:
      containers:
        - name: hoppscotch
-         image:  hoppscotch/hoppscotch:2026.3.0
+         image:  hoppscotch/hoppscotch:2026.9.0
          ports:
            - containerPort: 3000
            - containerPort: 3100
