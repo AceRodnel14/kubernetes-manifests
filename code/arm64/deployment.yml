@@ -17,7 +17,7 @@ spec:
         kubernetes.io/arch: arm64
       initContainers:
         - name: patch-s6
-          image: linuxserver/code-server:4.112.0
+          image: linuxserver/code-server:1.141.0
           command:
             - sh
             - -c
@@ -34,7 +34,7 @@ spec:
               mountPath: /patched
       containers:
         - name: codearm
-          image: linuxserver/openvscode-server:1.109.5
+          image: linuxserver/openvscode-server:1.141.0
           ports:
             - containerPort: 8443
           env:

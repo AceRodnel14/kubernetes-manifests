@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: termpyfilebrowser-from-igchromium-only
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: termpyfilebrowser
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: igchromium
+      ports:
+        - protocol: TCP
+          port: 7681
+        - protocol: TCP
+          port: 8080

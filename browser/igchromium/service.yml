@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: igchromium-service
+  namespace: default
 spec:
   selector:
     app: igchromium
@@ -9,3 +10,23 @@ spec:
     - protocol: TCP
       port: 3000
       targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: termpyfilebrowser-service
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: termpyfilebrowser
+  ports:
+    - name: ttyd
+      protocol: TCP
+      port: 7681
+      targetPort: ttyd-port
+    - name: filebrowser
+      protocol: TCP
+      port: 8080
+      targetPort: fileb-port
+ 

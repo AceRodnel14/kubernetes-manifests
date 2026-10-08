@@ -3,8 +3,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: igchromium
+  namespace: default
 spec:
-  replicas: 0
+  replicas: 0  # KEDA HTTPScaledObject owns the replica count
   selector:
     matchLabels:
       app: igchromium
@@ -28,12 +29,54 @@ spec:
             - name: TZ
               value: Asia/Manila
             - name: CHROME_CLI
-              value: http://pc.xyz.abc/
+              value: >-
+                http://pc.xyz.abc/
+                http://termpyfilebrowser-service.default.svc.cluster.local:8080/
+                http://termpyfilebrowser-service.default.svc.cluster.local:7681/
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              memory: 4Gi
           volumeMounts:
             - name: config-volume
               mountPath: /config
-              readOnly: false
-        - name: termpyfilebrowser-sidecar
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: igchromium-config-pvc
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: termpyfilebrowser
+  namespace: default
+spec:
+  replicas: 0  # KEDA ScaledObject follows igchromium's pod count
+  selector:
+    matchLabels:
+      app: termpyfilebrowser
+  template:
+    metadata:
+      labels:
+        app: termpyfilebrowser
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: termpyfilebrowser
           image: eacer/custom-termpyfilebrowser:main-260802223655
           ports:
             - name: ttyd-port
@@ -45,10 +88,19 @@ spec:
               value: Asia/Manila
             - name: WORKDIR_PATH
               value: /config
+          readinessProbe:
+            tcpSocket:
+              port: fileb-port
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
           volumeMounts:
             - name: config-volume
               mountPath: /config
-              readOnly: false
       volumes:
         - name: config-volume
           persistentVolumeClaim:

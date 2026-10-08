@@ -14,3 +14,21 @@ spec:
     min: 0
     max: 1
   scaledownPeriod: 3600
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: termpyfilebrowser-follow-igchromium
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: termpyfilebrowser
+  minReplicaCount: 0
+  maxReplicaCount: 1
+  pollingInterval: 5
+  cooldownPeriod: 60
+  triggers:
+    - type: kubernetes-workload
+      metadata:
+        podSelector: app=igchromium
+        value: '1'

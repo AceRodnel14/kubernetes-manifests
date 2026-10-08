@@ -1,14 +1,14 @@
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
 metadata:
-  name: msoffcryptool-web
+  name: docuscrypt
   namespace: default
 spec:
   hosts: 
-    - docucrypt.xyz.abc  # CHANGEME: same domain as ingress-route.yml
+    - docuscrypt.xyz.abc  # CHANGEME: same domain as ingress-route.yml
   scaleTargetRef:
-    name: msoffcryptool-web
-    service: msoffcryptool-web-service
+    name: docuscrypt
+    service: docuscrypt-service
     port: 8000
   replicas:
     min: 0

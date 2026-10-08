@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: msoffcryptool-web
+  name: docuscrypt
   namespace: default
   labels:
-    app: msoffcryptool-web
+    app: docuscrypt
 spec:
   replicas: 0  # KEDA's HTTPScaledObject drives this from here — start at zero
   selector:
     matchLabels:
-      app: msoffcryptool-web
+      app: docuscrypt
   template:
     metadata:
       labels:
-        app: msoffcryptool-web
+        app: docuscrypt
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
       containers:
-        - name: msoffcryptool-web
-          image: eacer/msoffcryptool-web:main  # CHANGEME: your built/pushed image
+        - name: docuscrypt
+          image: eacer/docuscrypt:v2
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
@@ -44,7 +44,3 @@ spec:
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 15
-      # Deliberately no volumes/volumeMounts here — the app only ever writes
-      # to its own container-local temp dir (see app/main.py: _new_tmpdir()),
-      # which is cleaned up per-request and disappears with the pod on
-      # scale-to-zero. No PVC/PV needed for this app.
