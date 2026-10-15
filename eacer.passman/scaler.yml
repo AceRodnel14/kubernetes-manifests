@@ -1,0 +1,16 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: passman
+  namespace: default
+spec:
+  hosts:
+    - passman.xyz.abc  # CHANGEME: same domain as ingress-route.yml
+  scaleTargetRef:
+    name: passman
+    service: passman-service
+    port: 8080
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 1800  # 30 min idle -> scale to zero
