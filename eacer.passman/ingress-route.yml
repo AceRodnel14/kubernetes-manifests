@@ -7,11 +7,11 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`passman.xyz.abc`)  # CHANGEME: your real homelab domain
+    - match: Host(`passman.k8s.xyz.abc`)
       kind: Rule
       services:
         - name: keda-add-ons-http-interceptor-proxy
           namespace: keda
           port: 8080
   tls:
-    secretName: homelab-tls
+    secretName: k8s-homelab-tls

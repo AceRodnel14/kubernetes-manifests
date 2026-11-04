@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: certifire
+  namespace: default
+  labels:
+    app: certifire
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: certifire
+  template:
+    metadata:
+      labels:
+        app: certifire
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      containers:
+        - name: certifire
+          image: eacer/certifire:main
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+          - secretRef:
+              name: certifire-secrets
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+              ephemeral-storage: "50Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+              ephemeral-storage: "100Mi"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 1
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 15

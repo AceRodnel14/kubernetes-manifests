@@ -16,29 +16,24 @@ spec:
         app: passman
     spec:
       nodeSelector:
-        kubernetes.io/arch: amd64
+        kubernetes.io/arch: arm64
       containers:
         - name: passman
           image: eacer/passman:main
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
-          env:
-            # The database must already exist; passman creates its tables on startup.
-            - name: DATABASE_URL
-              value: postgres://passman:passme@db.server.com/passman  # CHANGEME: user, password, host, db
-            # - name: SECURE_COOKIE
-            #   value: "true"  # served over HTTPS through Traefik
-            - name: SESSION_MAX_AGE
-              value: "14d"
+          envFrom:
+          - secretRef:
+              name: passman-secrets
           resources:
             requests:
               cpu: "50m"
               memory: "64Mi"
               ephemeral-storage: "50Mi"
             limits:
-              cpu: "500m"      # login hashing (Argon2id) is CPU-heavy for a moment
-              memory: "256Mi"  # each login briefly uses ~64Mi for Argon2id
+              cpu: "500m"
+              memory: "256Mi"
               ephemeral-storage: "100Mi"
           readinessProbe:
             httpGet:

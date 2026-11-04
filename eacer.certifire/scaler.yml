@@ -1,0 +1,16 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: certifire
+  namespace: default
+spec:
+  hosts:
+    - certifire.k8s.xyz.abc
+  scaleTargetRef:
+    name: certifire
+    service: certifire-service
+    port: 8080
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 1800
