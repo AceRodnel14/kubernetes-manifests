@@ -5,11 +5,11 @@ metadata:
   namespace: default
 spec:
   hosts: 
-    - docuscrypt.xyz.abc  # CHANGEME: same domain as ingress-route.yml
+    - docuscrypt.k8s.xyz.abc  # CHANGEME: same domain as ingress-route.yml
   scaleTargetRef:
     name: docuscrypt
     service: docuscrypt-service
-    port: 8000
+    port: 8080
   replicas:
     min: 0
     max: 1

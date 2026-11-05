@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jira-workloginator-service
+  namespace: default
+spec:
+  selector:
+    app: jira-workloginator
+  ports:
+    - port: 8080
+      targetPort: 8080

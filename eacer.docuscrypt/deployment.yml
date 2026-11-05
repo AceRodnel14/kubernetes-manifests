@@ -16,13 +16,13 @@ spec:
         app: docuscrypt
     spec:
       nodeSelector:
-        kubernetes.io/arch: amd64
+        kubernetes.io/arch: arm64
       containers:
         - name: docuscrypt
-          image: eacer/docuscrypt:v2
+          image: eacer/docuscrypt:main
           imagePullPolicy: Always
           ports:
-            - containerPort: 8000
+            - containerPort: 8080
           resources:
             requests:
               cpu: "50m"

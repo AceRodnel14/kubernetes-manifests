@@ -1,0 +1,16 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: jira-workloginator
+  namespace: default
+spec:
+  hosts:
+    - jira-inator.k8s.xyz.abc
+  scaleTargetRef:
+    name: jira-workloginator
+    service: jira-workloginator-service
+    port: 8080
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 1800
