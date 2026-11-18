@@ -8,10 +8,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - cdn.xyz.abc
+        - cdn.k8s.xyz.abc
       secretName: k8s-homelab-tls
   rules:
-    - host: cdn.xyz.abc
+    - host: cdn.k8s.xyz.abc
       http:
         paths:
           - path: /
