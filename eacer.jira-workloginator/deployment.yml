@@ -19,7 +19,7 @@ spec:
         kubernetes.io/arch: arm64
       containers:
         - name: jira-workloginator
-          image: eacer/jira-workloginator:main
+          image: eacer/jira-workloginator:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

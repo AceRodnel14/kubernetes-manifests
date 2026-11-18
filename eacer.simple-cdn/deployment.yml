@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cdn
+  template:
+    metadata:
+      labels:
+        app: cdn
+    spec:
+      containers:
+        - name: cdn
+          image: eacer/simple-cdn-service:latest
+          ports:
+            - containerPort: 8888
+          env:
+            - name: SERVER_NAME
+              value: cdn.xyz.abc,cdn.k8s.xyz.abc
+            - name: ALLOWED_LAN
+              value: '10.14.1.0/24 10.14.0.0/16'
+            - name: SECURED_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cdn-secret
+                  key: SECURED_KEY
+          volumeMounts:
+            - name: data-volume
+              mountPath: /usr/share/nginx/html
+              readOnly: true
+          imagePullPolicy: Always
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: cdn-data-pvc

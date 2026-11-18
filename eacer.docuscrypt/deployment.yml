@@ -19,7 +19,7 @@ spec:
         kubernetes.io/arch: arm64
       containers:
         - name: docuscrypt
-          image: eacer/docuscrypt:main
+          image: eacer/docuscrypt:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

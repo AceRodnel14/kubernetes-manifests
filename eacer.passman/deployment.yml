@@ -19,7 +19,7 @@ spec:
         kubernetes.io/arch: arm64
       containers:
         - name: passman
-          image: eacer/passman:main
+          image: eacer/passman:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

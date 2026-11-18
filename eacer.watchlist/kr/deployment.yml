@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: watchlist-kr
-          image: eacer/watchlist:main
+          image: eacer/watchlist:latest
           ports:
             - containerPort: 3000
           env:

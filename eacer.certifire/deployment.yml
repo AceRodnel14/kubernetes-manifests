@@ -19,7 +19,7 @@ spec:
         kubernetes.io/arch: arm64
       containers:
         - name: certifire
-          image: eacer/certifire:main
+          image: eacer/certifire:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

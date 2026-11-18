@@ -17,7 +17,7 @@ spec:
         kubernetes.io/arch: arm64
       initContainers:
         - name: patch-s6
-          image: linuxserver/code-server:1.141.0
+          image: linuxserver/code-server:4.145.2
           command:
             - sh
             - -c
