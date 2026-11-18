@@ -19,7 +19,7 @@ spec:
             - containerPort: 80
           env:
             - name: SERVER_NAME
-              value: cdn.xyz.abc,cdn.k8s.xyz.abc
+              value: "cdn.xyz.abc cdn.k8s.xyz.abc"
             - name: ALLOWED_LAN
               value: '10.14.1.0/24 10.14.0.0/16'
             - name: SECURED_KEY
