@@ -16,7 +16,7 @@ spec:
         - name: cdn
           image: eacer/simple-cdn-service:latest
           ports:
-            - containerPort: 8888
+            - containerPort: 80
           env:
             - name: SERVER_NAME
               value: cdn.xyz.abc,cdn.k8s.xyz.abc

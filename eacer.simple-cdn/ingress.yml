@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: cdn-ingress
+  name: cdn-https-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
@@ -20,12 +20,12 @@ spec:
               service:
                 name: cdn-service
                 port:
-                  number: 8888
+                  number: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: cdn-ingress
+  name: cdn-http-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
@@ -39,4 +39,4 @@ spec:
               service:
                 name: cdn-service
                 port:
-                  number: 8888
+                  number: 80
